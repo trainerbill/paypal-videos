@@ -1,0 +1,108 @@
+{{> header}}
+<h3>Return URL/Confirmation</h3>
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <span class="card-title">PayPal Account Information</span>
+            <div class="card-content">
+                <table class="bordered">
+                    <thead></thead>
+                    <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>{{account.name}}</td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td>{{account.email}}</td>
+                        </tr>
+                        <tr>
+                            <td>Phone</td>
+                            <td>{{account.phone}}</td>
+                        </tr>
+                        <tr>
+                            <td>Status</td>
+                            <td>{{account.status}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <span class="card-title">Shipping Address</span>
+            <div class="card-content">
+                <table class="bordered">
+                    <thead></thead>
+                    <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>{{address.name}}</td>
+                        </tr>
+                        <tr>
+                            <td>Street</td>
+                            <td>{{address.street}}</td>
+                        </tr>
+                        <tr>
+                            <td>City</td>
+                            <td>{{address.city}}</td>
+                        </tr>
+                        <tr>
+                            <td>State</td>
+                            <td>{{address.state}}</td>
+                        </tr>
+                        <tr>
+                            <td>Zip</td>
+                            <td>{{address.zip}}</td>
+                        </tr>
+                        <tr>
+                            <td>Country</td>
+                            <td>{{address.country}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <span class="card-title">Order Information</span>
+            <div class="card-content">
+                <table class="bordered">
+                    <thead></thead>
+                    <tbody>
+                        <tr>
+                            <td>Amount</td>
+                            <td>{{order.amount}}</td>
+                        </tr>
+                        <tr>
+                            <td>Currency</td>
+                            <td>{{order.currency}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-actions">
+                <form method="post" action="/classic/process">
+                    <input type="hidden" name="token" value="{{order.token}}" />
+                    <input type="hidden" name="payerid" value="{{order.payerid}}" />
+                    <input type="hidden" name="amount" value="{{order.amount}}" />
+                    <input type="hidden" name="payment" value="{{order.action}}" />
+                    <input type="submit" class="waves-effect waves-light btn" style="width: 100%" value="Place Order" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{{> footer}}

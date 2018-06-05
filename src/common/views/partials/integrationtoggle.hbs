@@ -1,0 +1,22 @@
+<script>
+    function integrationToggle() {
+        if (document.getElementById('integrationToggle').checked) {
+            window.location.search = 'complete=true';
+        } else {
+            window.location.search = 'complete=false'
+        }
+    }
+    
+</script>
+<div class="switch" onclick="integrationToggle()">
+    <label>
+    Off
+    {{#if complete}}
+    <input id="integrationToggle" type="checkbox" checked="checked" />
+    {{else}}
+    <input id="integrationToggle" type="checkbox" />
+    {{/if}}
+    <span class="lever"></span>
+    On
+    </label>
+</div>

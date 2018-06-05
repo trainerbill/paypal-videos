@@ -1,0 +1,69 @@
+{{> header}}
+<h3>Shopping Cart</h3>
+<div class="row">
+    <div class="col s6">
+        {{> cartitems}}
+    </div>
+    <div class="col s6">
+        <div class="card">
+            <span class="card-title">Total: $50.00</span>
+            <div class="card-content valign-wrapper">
+                <a class="waves-effect waves-light btn" href="#">Checkout</a>
+                <span style="padding-left: 10px; padding-right: 10px">OR</span>
+                <form id="paypalForm" method="post" action="/classic/setexpresscheckoutredirect">
+                    <input type="hidden" name="action" value="Sale" />
+                    <input type="image" src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-large.png" />
+                </form>
+                {{#if complete}}
+                <div id="paypal-button"></div>
+                <script src='https://www.paypalobjects.com/api/checkout.js'></script>
+                <script type="text/javascript">
+var paypalForm = document.getElementById('paypalForm');
+paypalForm.style.display = 'none';
+function formEncode(form) {
+    var ret = {};
+    Object.keys(form.elements).forEach(function (key) {
+        ret[form.elements[key].name] = form.elements[key].value;
+    });
+    return ret;
+}
+paypal.Button.render({
+    env: 'sandbox', // Or 'sandbox',
+    payment: function(data, actions) {
+        return paypal.request.post(paypalForm.getAttribute('action'), formEncode(paypalForm), {
+            headers: {
+                'Accept': 'application/paypal-json-token',
+            }
+        })
+        .then(function (response) {
+            if (!response || !response.token) {
+                throw new Error('There was an error fetching the PayPal token');
+            }
+            return response.token;
+        })
+        .catch(function (err) {
+            throw err;
+        });
+    },
+    onAuthorize: function(data, actions) {
+        return actions.redirect();
+    },
+    onCancel: function (data, actions) {
+        return actions.redirect();
+    },
+    onError: function (error) {
+        // You will want to handle this differently
+        return alert(error);
+    }
+}, '#paypal-button');
+                </script>
+                {{/if}}
+            </div>
+            <div class="card-actions">
+                {{> integrationtoggle}}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{> footer}}

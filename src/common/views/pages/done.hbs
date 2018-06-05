@@ -1,0 +1,35 @@
+{{> header}}
+
+<h3>Congrats</h3>
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <span class="card-title">Order Information</span>
+            <div class="card-content">
+                <table>
+                    <thead></thead>
+                    <tbody>
+                        <tr>
+                            <td>ID</td>
+                            <td>{{transaction.id}}</td>
+                        </tr>
+                        <tr>
+                            <td>Amount</td>
+                            <td>{{transaction.amount}}</td>
+                        </tr>
+                        <tr>
+                            <td>Status</td>
+                            <td>{{transaction.status}}</td>
+                        </tr>
+                        <tr>
+                            <td>Timestamp</td>
+                            <td>{{transaction.timestamp}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{> footer}}
