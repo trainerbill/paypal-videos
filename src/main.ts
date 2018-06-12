@@ -7,11 +7,12 @@ import * as hblayouts from 'handlebars-layouts';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.useStaticAssets(__dirname + '/public');
+
   const dir = __dirname + '/**/views';
   glob(dir , (err, directories) => {
     app.set('views', directories);
     app.setViewEngine('hbs');
-    app.useStaticAssets(__dirname + '/public');
   });
 
   glob(dir + '/partials' , (err, directories) => {
