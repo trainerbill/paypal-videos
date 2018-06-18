@@ -1,0 +1,19 @@
+<div class="row">
+    <div class="col s3">
+        {{> integrationtoggle}}
+        <p>
+            <input type="radio" name="paymentMethod" value="creditcard" id="creditcard" />
+            <label for="creditcard">Credit Card</label>
+        </p>
+        <p>
+            <input type="radio" name="paymentMethod" value="other" id="other" />
+            <label for="other">Other</label>
+        </p>
+    </div>
+    <div class="col s9">
+        {{> creditcardform}}
+        {{#if complete}}
+        <div id="paypal-button"></div>
+        {{/if}}
+    </div>
+</div>

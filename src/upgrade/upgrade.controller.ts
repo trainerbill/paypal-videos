@@ -27,4 +27,12 @@ export class UpgradeController {
         };
     }
 
+    @Get('form/payment')
+    @Render('upgrade-form-payment')
+    formPayment(@Req() req) {
+        return {
+            complete: req.query.complete === 'true' ? true : false,
+        };
+    }
+
 }

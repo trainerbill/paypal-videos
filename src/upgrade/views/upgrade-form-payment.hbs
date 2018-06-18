@@ -1,0 +1,119 @@
+{{> header}}
+<h3>Payment Page</h3>
+<form id="paymentForm" action="/classic/setexpresscheckoutredirect" method="post">
+    <div class="row">
+        <div class="col s12">
+            <h4>Payment Method</h4>
+            <hr />
+            {{> paymentmethods}}
+        </div>
+    </div>
+    <div id="shippingaddress" class="row">
+        <div class="col s12">
+            <h4>Shipping Address</h4>
+            <hr />
+            {{> addressform}}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12">
+            <button id="continue-button" type="submit" class="waves-effect waves-light btn" style="width: 100%">Continue</button>
+        </div>
+    </div>
+
+</form>
+
+<script type="text/javascript">
+    var p = document.createElement('p');
+    var input = document.createElement('input');
+    input.type = "radio";
+    input.name = "paymentMethod";
+    input.value = "paypal";
+    input.id = "paypal";
+    var label = document.createElement('label');
+    label.setAttribute('for', 'paypal');
+    label.textContent = "PayPal";
+    p.appendChild(input);
+    p.appendChild(label);
+    var other = document.getElementById('other')
+    other.parentNode.parentNode.insertBefore(p, other.parentNode);
+</script>
+
+{{#if complete}}
+<script src='https://www.paypalobjects.com/api/checkout.js'></script>
+{{/if}}
+
+<script type="text/javascript">
+    var ccform = document.getElementById('ccform');
+    ccform.style.display = 'none';
+    {{#if complete}}
+    var ppbutton = document.getElementById('paypal-button');
+    ppbutton.style.display = 'none';
+    {{/if}}
+
+    document.getElementsByName('paymentMethod').forEach(function(ele) {
+        ele.addEventListener('change', function () {
+            if (this.value === 'creditcard') {
+                ccform.style.display = 'initial'
+            } else {
+                ccform.style.display = 'none' 
+            }
+
+            if (this.value === 'other') {
+                document.getElementById('ccform').style.display = 'none' 
+            } 
+
+            if (this.value === 'paypal') {
+                {{#if complete}}
+                ppbutton.style.display = 'initial';
+                document.getElementById('continue-button').classList.add('disabled');
+                {{/if}}
+                document.getElementById('shippingaddress').style.display = 'none';
+            } else {
+                {{#if complete}}
+                ppbutton.style.display = 'none';
+                document.getElementById('continue-button').classList.remove('disabled');
+                {{/if}}
+                document.getElementById('shippingaddress').style.display = 'initial';
+            }
+        });
+    });
+
+    {{#if complete}}
+    var paymentForm = document.getElementById('paymentForm');
+    paypal.Button.render({
+        env: 'sandbox',
+        payment: function(data, actions) {
+            return paypal.request.post(paymentForm.getAttribute('action'), $('#paymentForm').serialize(), {
+                headers: {
+                    'Accept': 'application/paypal-json-token',
+                }
+            })
+            .then(function (response) {
+                if (!response || !response.token) {
+                    throw new Error('There was an error fetching the PayPal token');
+                }
+                return response.token;
+            })
+            .catch(function (err) {
+                throw err;
+            });
+        },
+        onAuthorize: function(data, actions) {
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            return actions.redirect();
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button');
+    {{/if}}
+</script>
+
+
+
+{{> footer}}

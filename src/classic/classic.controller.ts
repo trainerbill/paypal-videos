@@ -29,8 +29,11 @@ export class ClassicController {
     }
 
     @Post('setexpresscheckoutredirect')
-    async postredirect(@Res() res) {
+    async postredirect(@Res() res, @Body() body) {
         try {
+            if (body.paymentMethod && body.paymentMethod !== 'paypal') {
+                return res.redirect(`/classic/done`);
+            }
             const result = await this._setExpressCheckout();
             return res.redirect(`https://www.sandbox.paypal.com/checkoutnow?token=${result.TOKEN}`);
         } catch (err) {
@@ -85,6 +88,10 @@ export class ClassicController {
             },
         };
     }
+
+    @Get('done')
+    @Render('pages/donenothing')
+    async done() {}
 
     @Post('api/setexpresscheckout')
     apisetec() {

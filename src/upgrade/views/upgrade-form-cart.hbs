@@ -8,7 +8,7 @@
         <div class="card">
             <span class="card-title">Total: $50.00</span>
             <div class="card-content valign-wrapper">
-                <a class="waves-effect waves-light btn" href="#">Checkout</a>
+                <a class="waves-effect waves-light btn" href="/upgrade/form/payment">Checkout</a>
                 <span style="padding-left: 10px; padding-right: 10px">OR</span>
                 <form id="paypalForm" method="post" action="/classic/setexpresscheckoutredirect">
                     <input type="hidden" name="action" value="Sale" />
@@ -20,17 +20,10 @@
                 <script type="text/javascript">
 var paypalForm = document.getElementById('paypalForm');
 paypalForm.style.display = 'none';
-function formEncode(form) {
-    var ret = {};
-    Object.keys(form.elements).forEach(function (key) {
-        ret[form.elements[key].name] = form.elements[key].value;
-    });
-    return ret;
-}
 paypal.Button.render({
     env: 'sandbox', // Or 'sandbox',
     payment: function(data, actions) {
-        return paypal.request.post(paypalForm.getAttribute('action'), formEncode(paypalForm), {
+        return paypal.request.post(paypalForm.getAttribute('action'), $('paymentForm').serialize(), {
             headers: {
                 'Accept': 'application/paypal-json-token',
             }
