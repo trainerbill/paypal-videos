@@ -86,18 +86,14 @@
         env: 'sandbox',
         payment: function(data, actions) {
             return new paypal.Promise(function (resolve, reject) {
-                $.ajax(paymentForm.getAttribute('action'), {
-                    crossDomain: true,
+                $.ajax('/classic/api/setexpresscheckout', {
                     data: $('#paymentForm').serialize(),
-                    headers: {
-                        'Accept': 'application/paypal-json-token',
-                    },
                     method: 'POST',
                     success: function (response) {
-                        if (!response || !response.token) {
+                        if (!response || !response.TOKEN) {
                             throw new Error('There was an error fetching the PayPal token');
                         }
-                        return resolve(response.token);
+                        return resolve(response.TOKEN);
                     },
                     error: function (error) {
                         return reject(error);
@@ -116,6 +112,23 @@
             return alert(error);
         }
     }, '#paypal-button');
+    {{else}}
+    document.querySelector('#continue-button').addEventListener('click', function(event) {
+        event.preventDefault();
+        $.ajax('/classic/api/setexpresscheckout', {
+            data: $('#paymentForm').serialize(),
+            method: 'POST',
+            success: function (response) {
+                if (!response || !response.TOKEN) {
+                    throw new Error('There was an error fetching the PayPal token');
+                }
+                window.location = 'https://www.sandbox.paypal.com/checkoutnow?token=' + response.TOKEN;
+            },
+            error: function (error) {
+                alert(error);
+            }
+        });
+    });
     {{/if}}
 </script>
 

@@ -22,19 +22,23 @@ paypalLink.style.display = 'none';
 paypal.Button.render({
     env: 'sandbox', // Or 'sandbox',
     payment: function(data, actions) {
-        return paypal.request.get(paypalLink.getAttribute('href'), {
-            headers: {
-                'Accept': 'application/paypal-json-token',
-            }
-        })
-        .then(function (response) {
-            if (!response || !response.token) {
-                throw new Error('There was an error fetching the PayPal token');
-            }
-            return response.token;
-        })
-        .catch(function (err) {
-            throw err;
+        return new paypal.Promise(function (resolve, reject) {
+            $.ajax(paypalLink.getAttribute('href'), {
+                crossDomain: true,
+                headers: {
+                    'Accept': 'application/paypal-json-token',
+                },
+                method: 'GET',
+                success: function (response) {
+                    if (!response || !response.token) {
+                        throw new Error('There was an error fetching the PayPal token');
+                    }
+                    return resolve(response.token);
+                },
+                error: function (error) {
+                    return reject(error);
+                }
+            });
         });
     },
     onAuthorize: function(data, actions) {

@@ -35,4 +35,12 @@ export class UpgradeController {
         };
     }
 
+    @Get('ajax/payment')
+    @Render('upgrade-ajax-payment')
+    ajaxPayment(@Req() req) {
+        return {
+            complete: req.query.complete === 'true' ? true : false,
+        };
+    }
+
 }
