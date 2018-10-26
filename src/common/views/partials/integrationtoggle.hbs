@@ -1,22 +1,25 @@
 <script>
     function integrationToggle() {
+        var searchParams = new URLSearchParams(window.location.search);
         if (document.getElementById('integrationToggle').checked) {
-            window.location.search = 'complete=true';
+            searchParams.set('complete', true);
+            window.location.search = searchParams.toString();
         } else {
-            window.location.search = 'complete=false'
+            searchParams.set('complete', false);
+            window.location.search = searchParams.toString();
         }
     }
     
 </script>
-<div class="switch" onclick="integrationToggle()">
+<span class="switch" onclick="integrationToggle()">
     <label>
-    Off
+    Hide
     {{#if complete}}
     <input id="integrationToggle" type="checkbox" checked="checked" />
     {{else}}
     <input id="integrationToggle" type="checkbox" />
     {{/if}}
     <span class="lever"></span>
-    On
+    Show
     </label>
-</div>
+</span>

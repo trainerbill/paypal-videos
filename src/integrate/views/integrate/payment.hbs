@@ -1,0 +1,241 @@
+{{> header}}
+<script type="text/javascript">
+    var searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('paymentId')) {
+        window.location.href = '/rest/confirm' + window.location.search;
+    }
+</script>
+{{#if complete}}
+<script src='https://www.paypalobjects.com/api/checkout.js'></script>
+{{/if}}
+<h3>Payment Page</h3>
+<form id="paymentForm" action="/rest/confirm" method="get">
+    <div id="paymentMethod" class="row">
+        <div class="col s12">
+            <div class="card">
+                <span class="card-title">Payment Method</span>
+                <div class="card-content">
+                    <div class="row">
+                        <div class="col s3">
+                            <p>
+                                <input type="radio" name="paymentMethod" value="creditcard" id="creditcard" />
+                                <label for="creditcard">Credit Card</label>
+                            </p>
+                            <p>
+                                <input type="radio" name="paymentMethod" value="other" id="other" />
+                                <label for="other">Other</label>
+                            </p>
+                        </div>
+                        <div class="col s9">
+                            {{> creditcardform}}
+                            {{#if complete}}
+                            <div id="ppcontainer" class="row" style="display:none">
+                                <div class="col s12">
+                                    <ul class="tabs">
+                                        <li class="tab col s4"><a class="blue-grey-text" href="#client">Client</a></li>
+                                        <li class="tab col s4"><a class="blue-grey-text" href="#paypal-switch">Server-PayPal</a></li>
+                                        <li class="tab col s4"><a class="blue-grey-text" href="#jquery">Server-Query</a></li>
+                                        <div class="indicator blue-grey" style="z-index:1"></div>
+                                    </ul>
+                                </div>
+                                <div id="client" class="col s12">
+                                    <span id="paypal-button-client"></span>
+                                </div>
+                                <div id="paypal-switch" class="col s12">
+                                    <span id="paypal-button-paypal"></span>    
+                                </div>
+                                <div id="jquery" class="col s12">
+                                    <span id="paypal-button-jquery"></span> 
+                                </div>
+                            </div>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12">
+            <button id="continue-button" type="submit" class="waves-effect waves-light btn" style="width: 100%">Continue</button>
+        </div>
+    </div>
+</form>
+
+{{#if complete}}
+<script type="text/javascript">
+    var p = document.createElement('p');
+    var input = document.createElement('input');
+    input.type = "radio";
+    input.name = "paymentMethod";
+    input.value = "paypal";
+    input.id = "paypal";
+    var label = document.createElement('label');
+    label.setAttribute('for', 'paypal');
+    label.textContent = "PayPal";
+    p.appendChild(input);
+    p.appendChild(label);
+    var other = document.getElementById('other')
+    other.parentNode.parentNode.insertBefore(p, other.parentNode);
+</script>
+{{/if}}
+
+<script type="text/javascript">
+    var ccform = document.getElementById('ccform');
+    ccform.style.display = 'none';
+    document.getElementsByName('paymentMethod').forEach(function(ele) {
+        ele.addEventListener('change', function () {
+            if (this.value === 'creditcard') {
+                ccform.style.display = 'initial'
+            } else {
+                ccform.style.display = 'none' 
+            }
+
+            if (this.value === 'other') {
+                document.getElementById('ccform').style.display = 'none' 
+            } 
+            {{#if complete}}
+            if (this.value === 'paypal') {
+                document.getElementById('ppcontainer').style.display = 'initial';
+                document.getElementById('continue-button').classList.add('disabled');
+            } else {
+                document.getElementById('ppcontainer').style.display = 'none';
+                document.getElementById('continue-button').classList.remove('disabled');
+            }
+            {{/if}}
+        });
+    });
+</script>
+
+{{#if complete}}
+<script type="text/javascript">
+    paypal.Button.render({
+        client: {
+            sandbox:    'ARkR7soWd2kUxFCNPHOmyb3IQhOwiL-wYhRmsRRD1SdslE0u-lCEps4LdN_KocpyEPgaWJXcsFuwd99M',
+            production: '<insert production client id>',
+        },
+        env: 'sandbox', // Or 'sandbox',
+        payment: function(data, actions) {
+            // You can use most of the options from the REST api
+            // https://developer.paypal.com/docs/api/payments/#payment_create
+            return actions.payment.create({
+                payment: {
+                    transactions: [
+                        {
+                            amount: { total: '0.01', currency: 'USD' },
+                            item_list: {
+                                shipping_address: {
+                                    recipient_name: 'David Larusso',
+                                    line1: '2211 N. 1st Street',
+                                    city: 'San Jose',
+                                    state: 'CA',
+                                    postal_code: '95131',
+                                    country_code: 'US',
+                                },
+                            },
+                        }
+                    ],
+                    redirect_urls: {
+                        return_url: "http://localhost:3000/rest/confirm",
+                        cancel_url: "http://localhost:3000/classic/cancel",
+                    }
+                },
+                experience: {
+                    input_fields: {
+                        address_override: 1,
+                    }
+                }
+            })
+            .then(function (response) {
+                console.log('Create Response', response);
+                // Do something before rendering PayPal
+                return response;
+            })
+            .catch(function (err) {
+                // Throw error to onError callback
+                throw err;
+            });
+        },
+        onAuthorize: function(data, actions) {
+            console.log('onAuthorize data', data);
+            console.log('onAuthorize actions', actions);
+            // Alternative
+            // return window.location.href = '/rest/confirm?paymentId=' + data.paymentID
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            // You will want to handle this differently
+            return alert('You cancelled!');
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button-client');
+
+    paypal.Button.render({
+        env: 'sandbox', // Or 'sandbox',
+        payment: function(data, actions) {
+            return new paypal.Promise(function (resolve, reject) {
+                $.ajax('/rest/api/create', {
+                    method: 'POST',
+                    success: function (response) {
+                        if (!response || !response.id) {
+                            throw new Error('There was an error fetching the PayPal token');
+                        }
+                        return resolve(response.id);
+                    },
+                    error: function (error) {
+                        return reject(error);
+                    }
+                });
+            });
+        },
+        onAuthorize: function(data, actions) {
+            console.log('onAuthorize data', data);
+            console.log('onAuthorize actions', actions);
+            // Alternative
+            // return window.location.href = '/rest/confirm?paymentId=' + data.paymentID
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            // You will want to handle this differently
+            return alert('You cancelled!');
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button-jquery');
+
+    paypal.Button.render({
+        env: 'sandbox', // Or 'sandbox',
+        payment: function(data, actions) {
+            return paypal.request.post('/rest/api/create')
+                .then(function (response) {
+                    return response.id;
+                })
+                .catch(function (err) {
+                    // Throw error to onError callback
+                    throw err;
+                });
+        },
+        onAuthorize: function(data, actions) {
+            console.log('onAuthorize data', data);
+            console.log('onAuthorize actions', actions);
+            // Alternative
+            // return window.location.href = '/rest/confirm?paymentId=' + data.paymentID
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            // You will want to handle this differently
+            return alert('You cancelled!');
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button-paypal');
+</script>
+{{/if}}
+{{> footer}}

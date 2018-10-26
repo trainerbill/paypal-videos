@@ -92,11 +92,12 @@
     <div class="col s12">
         <div class="card">
             <div class="card-actions">
-                <form method="post" action="/classic/process">
+                <form method="post" action="/rest/process">
                     <input type="hidden" name="token" value="{{order.token}}" />
                     <input type="hidden" name="payerid" value="{{order.payerid}}" />
                     <input type="hidden" name="amount" value="{{order.amount}}" />
                     <input type="hidden" name="payment" value="{{order.action}}" />
+                    <input type="hidden" name="payer_id" value="{{account.payer_id}}" />
                     <input type="submit" class="waves-effect waves-light btn" style="width: 100%" value="Place Order" />
                 </form>
             </div>

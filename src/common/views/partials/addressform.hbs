@@ -1,34 +1,35 @@
-<div class="input-field col s6">
-    <input name="fname" placeholder="Fred" id="fname" />
-    <label class="active" for="fname">First Name</label> 
+<div class="row">
+    <div class="input-field col s12">
+        <input name="name" id="name" value="{{address.name}}"/>
+        <label class="active" for="name">Name</label> 
+    </div>
 </div>
 
-<div class="input-field col s6">
-    <input name="lname" placeholder="Flintstone" id="lname" />
-    <label class="active" for="lname">Last Name</label> 
+<div class="row">
+    <div class="input-field col s12">
+        <input name="street" id="street" value="{{address.street}}"/>
+        <label class="active" for="lname">Street</label> 
+    </div>
 </div>
 
-<div class="input-field col s12">
-    <input name="street" placeholder="123 Awesome Street" id="street" />
-    <label class="active" for="lname">Street</label> 
-</div>
+<div class="row">
+    <div class="input-field col s4">
+        <input name="city" id="city" value="{{address.city}}"/>
+        <label class="active" for="city">City</label> 
+    </div>
 
-<div class="input-field col s4">
-    <input name="city" placeholder="San Jose" id="city" />
-    <label class="active" for="city">City</label> 
-</div>
+    <div class="input-field col s2">
+        <input name="state" id="state" maxlength="2" value="{{address.state}}"/>
+        <label class="active" for="state">State</label> 
+    </div>
 
-<div class="input-field col s4">
-    <input name="state" placeholder="CA" id="state" maxlength="2"/>
-    <label class="active" for="state">State</label> 
-</div>
+    <div class="input-field col s4">
+        <input name="postal" id="postal" value="{{address.zip}}"/>
+        <label class="active" for="postal">Postal</label> 
+    </div>
 
-<div class="input-field col s4">
-    <input name="postal" placeholder="90210" id="postal" />
-    <label class="active" for="postal">Postal</label> 
-</div>
-
-<div class="input-field col s4">
-    <input name="country" placeholder="US" id="country" />
-    <label class="active" for="country">Country</label> 
+    <div class="input-field col s2">
+        <input name="country" id="country" value="{{address.country}}"/>
+        <label class="active" for="country">Country</label> 
+    </div>
 </div>

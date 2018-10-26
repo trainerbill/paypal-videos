@@ -1,0 +1,60 @@
+{{> header}}
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <span class="card-title">Shipping Address</span>
+            <div class="card-content">
+                {{> addressform}}
+            </div>
+            <div class="card-action">
+                <div class="row">
+                    {{#unless address.street }}
+                    <div class="col s4">
+                        <a id="populate" class="waves-effect waves-light btn">Populate</a>
+                    </div>
+                    <script type="text/javascript">
+                        $('#populate').click(function () {
+                            $('#name').val('David Larusso');
+                            $('#street').val('2211 N. 1st Street');
+                            $('#city').val('San Jose');
+                            $('#state').val('CA');
+                            $('#postal').val('95131');
+                            $('#country').val('US');
+                        });
+                    </script>
+                    {{/unless}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <span class="card-title">Shipping Options</span>
+            <div class="card-content">
+                <p>
+                    <input type="radio" name="shippingOption" value="normal" id="normal" />
+                    <label for="normal">7 day - Free</label>
+                </p>
+                <p>
+                    <input type="radio" name="shippingOption" value="overnight" id="overnight" />
+                    <label for="overnight">Overnight - $10</label>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <a id="continue" class="waves-effect waves-light btn" href="#">Continue</a>
+    </div>
+    <script type="text/javascript">
+        $('#continue').click(function () {
+            window.location.href = '/integrate/payment' + window.location.search;
+        });
+    </script>
+</div>
+{{> footer}}

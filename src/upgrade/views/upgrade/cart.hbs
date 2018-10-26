@@ -1,0 +1,204 @@
+{{> header}}
+{{#if complete}}
+<script src='https://www.paypalobjects.com/api/checkout.js'></script>
+{{/if}}
+<h3>Shopping Cart</h3>
+<div class="row">
+    <div class="col s6">
+        {{> cartitems}}
+    </div>
+    <div class="col s6">
+        <div class="card">
+            <span class="card-title">Total: $50.00</span>
+            <div class="card-content valign-wrapper">
+                <div class="row">
+                    <div class="col s12">
+                        <ul class="tabs">
+                            <li class="tab col s4"><a class="blue-grey-text" href="#form">Form</a></li>
+                            <li class="tab col s4"><a class="blue-grey-text" href="#link">Link</a></li>
+                            <li class="tab col s4"><a class="blue-grey-text" href="#ajax">AJAX</a></li>
+                            <div class="indicator blue-grey" style="z-index:1"></div>
+                        </ul>
+                    </div>
+                    <div id="form" class="col s12">
+                        <br/>
+                        <div class="row">
+                            <div class="col s6">
+                                <a class="waves-effect waves-light btn" href="/classic/shipping">Checkout</a>
+                            </div>
+                            <div class="col s6">
+                                <form id="paypalForm" method="post" action="/classic/setexpresscheckoutredirect">
+                                    <input type="hidden" name="action" value="Sale" />
+                                    <input class="responsive-img" type="image" src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-small.png" />
+                                </form>
+                                <span id="paypal-button-form"></span>
+                            </div>  
+                        </div>
+                    </div>
+                    <div id="link" class="col s12">
+                        <br/>
+                        <div class="row">
+                            <div class="col s6">
+                                <a class="waves-effect waves-light btn" href="/classic/shipping">Checkout</a>
+                            </div>
+                            <div class="col s6">
+                                <a id="paypalLink" href="/classic/setexpresscheckoutredirect">
+                                    <img src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-small.png"/>
+                                </a>
+                                <span id="paypal-button-link"></span>
+                            </div>  
+                        </div>
+                    </div>
+                    <div id="ajax" class="col s12">
+                        <br/>
+                        <div class="row">
+                            <div class="col s6">
+                                <a class="waves-effect waves-light btn" href="/classic/shipping">Checkout</a>
+                            </div>
+                            <div class="col s6">
+                                <form id="paypalFormAjax" method="post">
+                                    <input type="hidden" name="action" value="Sale" />
+                                </form>
+                                <a id="paypalLinkAjax" href="#">
+                                    <img class="responsive-img" src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-small.png"/>
+                                </a>
+                                <script type="text/javascript">
+document.querySelector('#paypalLinkAjax').addEventListener('click', function(event) {
+    event.preventDefault();
+    $.ajax('/classic/api/setexpresscheckout', {
+        data: $('#paymentFormAjax').serialize(),
+        method: 'POST',
+        success: function (response) {
+            if (!response || !response.TOKEN) {
+                throw new Error('There was an error fetching the PayPal token');
+            }
+            window.location = 'https://www.sandbox.paypal.com/checkoutnow?token=' + response.TOKEN;
+        },
+        error: function (error) {
+            alert(error);
+        }
+    });
+});
+                                </script>
+                                <span id="paypal-button-ajax"></span>
+                            </div>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{#if complete}}
+<script type="text/javascript">
+    // Form
+    var paypalForm = document.getElementById('paypalForm');
+    paypalForm.style.display = 'none';
+    paypal.Button.render({
+        env: 'sandbox', // Or 'sandbox',
+        payment: function(data, actions) {
+            return new paypal.Promise(function (resolve, reject) {
+                $.ajax(paypalForm.getAttribute('action'), {
+                    crossDomain: true,
+                    data: $('#paypalForm').serialize(),
+                    headers: {
+                        'Accept': 'application/paypal-json-token',
+                    },
+                    method: 'POST',
+                    success: function (response) {
+                        if (!response || !response.token) {
+                            throw new Error('There was an error fetching the PayPal token');
+                        }
+                        return resolve(response.token);
+                    },
+                    error: function (error) {
+                        return reject(error);
+                    }
+                });
+            });
+        },
+        onAuthorize: function(data, actions) {
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            return actions.redirect();
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button-form');
+
+    // Link
+    var paypalLink = document.getElementById('paypalLink');
+    paypalLink.style.display = 'none';
+    paypal.Button.render({
+        env: 'sandbox', // Or 'sandbox',
+        payment: function(data, actions) {
+            return new paypal.Promise(function (resolve, reject) {
+                $.ajax(paypalLink.getAttribute('href'), {
+                    crossDomain: true,
+                    headers: {
+                        'Accept': 'application/paypal-json-token',
+                    },
+                    method: 'GET',
+                    success: function (response) {
+                        if (!response || !response.token) {
+                            throw new Error('There was an error fetching the PayPal token');
+                        }
+                        return resolve(response.token);
+                    },
+                    error: function (error) {
+                        return reject(error);
+                    }
+                });
+            });
+        },
+        onAuthorize: function(data, actions) {
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            return actions.redirect();
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button-link');
+
+    // AJAX
+    document.getElementById('paypalLinkAjax').style.display = 'none';
+    paypal.Button.render({
+        env: 'sandbox',
+        payment: function(data, actions) {
+            return new paypal.Promise(function (resolve, reject) {
+                $.ajax('/classic/api/setexpresscheckout', {
+                    data: $('#paymentFormAjax').serialize(),
+                    method: 'POST',
+                    success: function (response) {
+                        if (!response || !response.TOKEN) {
+                            throw new Error('There was an error fetching the PayPal token');
+                        }
+                        return resolve(response.TOKEN);
+                    },
+                    error: function (error) {
+                        return reject(error);
+                    }
+                });
+            });
+        },
+        onAuthorize: function(data, actions) {
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            return actions.redirect();
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button-ajax');
+</script>
+{{/if}}
+{{> footer}}

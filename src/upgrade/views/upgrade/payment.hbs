@@ -1,0 +1,127 @@
+{{> header}}
+<script type="text/javascript">
+    var searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('token')) {
+        window.location.href = '/classic/confirm' + window.location.search;
+    }
+</script>
+<h3>Payment Page</h3>
+<form id="paymentForm" action="/classic/confirm" method="get">
+    <div id="paymentMethod" class="row">
+        <div class="col s12">
+            <div class="card">
+                <span class="card-title">Payment Method</span>
+                <div class="card-content">
+                    <div class="row">
+                        <div class="col s3">
+                            <p>
+                                <input type="radio" name="paymentMethod" value="creditcard" id="creditcard" />
+                                <label for="creditcard">Credit Card</label>
+                            </p>
+                            <p>
+                                <input type="radio" name="paymentMethod" value="paypal" id="paypal" />
+                                <label for="paypal">PayPal</label>
+                            </p>
+                            <p>
+                                <input type="radio" name="paymentMethod" value="other" id="other" />
+                                <label for="other">Other</label>
+                            </p>
+                        </div>
+                        <div class="col s9">
+                            {{> creditcardform}}
+                            <div id="ppcontainer" class="row" style="display:none">
+                                <div id="paypal-button"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+     <div class="row">
+        <div class="col s12">
+            <button id="continue-button" type="submit" class="waves-effect waves-light btn" style="width: 100%">Continue</button>
+        </div>
+    </div>
+</form>
+    
+{{#if complete}}
+<script src='https://www.paypalobjects.com/api/checkout.js'></script>
+{{/if}}
+
+<script type="text/javascript">
+    var ccform = document.getElementById('ccform');
+    ccform.style.display = 'none';
+    {{#if complete}}
+    var ppbutton = document.getElementById('ppcontainer');
+    ppbutton.style.display = 'none';
+    {{/if}}
+
+    document.getElementsByName('paymentMethod').forEach(function(ele) {
+        ele.addEventListener('change', function () {
+            if (this.value === 'creditcard') {
+                ccform.style.display = 'initial'
+            } else {
+                ccform.style.display = 'none' 
+            }
+
+            if (this.value === 'other') {
+                document.getElementById('ccform').style.display = 'none' 
+            } 
+
+            if (this.value === 'paypal') {
+                {{#if complete}}
+                ppbutton.style.display = 'initial';
+                document.getElementById('continue-button').classList.add('disabled');
+                {{/if}}
+            } else {
+                {{#if complete}}
+                ppbutton.style.display = 'none';
+                document.getElementById('continue-button').classList.remove('disabled');
+                {{/if}}
+            }
+        });
+    });
+
+    {{#if complete}}
+    var paymentForm = document.getElementById('paymentForm');
+    paypal.Button.render({
+        env: 'sandbox',
+        payment: function(data, actions) {
+            return new paypal.Promise(function (resolve, reject) {
+                $.ajax(paymentForm.getAttribute('action'), {
+                    crossDomain: true,
+                    data: $('#paymentForm').serialize(),
+                    headers: {
+                        'Accept': 'application/paypal-json-token',
+                    },
+                    method: 'GET',
+                    success: function (response) {
+                        if (!response || !response.token) {
+                            throw new Error('There was an error fetching the PayPal token');
+                        }
+                        return resolve(response.token);
+                    },
+                    error: function (error) {
+                        return reject(error);
+                    }
+                });
+            });
+        },
+        onAuthorize: function(data, actions) {
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            return actions.redirect();
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button');
+    {{/if}}
+</script>
+
+
+
+{{> footer}}

@@ -1,0 +1,183 @@
+{{> header}}
+{{#if complete}}
+<script src='https://www.paypalobjects.com/api/checkout.js'></script>
+{{/if}}
+<h3>Shopping Cart</h3>
+<div class="row">
+    <div class="col s6">
+        {{> cartitems}}
+    </div>
+    <div class="col s6">
+        <div class="card">
+            <span class="card-title">Total: $50.00</span>
+            <div class="card-action">
+                <div class="row">
+                    <div class="col s12">
+                        <ul class="tabs">
+                            <li class="tab col s4"><a class="blue-grey-text" href="#client">Client</a></li>
+                            <li class="tab col s4"><a class="blue-grey-text" href="#paypal">Server-PayPal</a></li>
+                            <li class="tab col s4"><a class="blue-grey-text" href="#jquery">Server-Query</a></li>
+                            <div class="indicator blue-grey" style="z-index:1"></div>
+                        </ul>
+                    </div>
+                    <div id="client" class="col s12">
+                        <br/>
+                        <div class="row">
+                            <div class="col s6">
+                                <a class="waves-effect waves-light btn" href="/rest/shipping">Checkout</a>
+                            </div>
+                            <div class="col s6">
+                                <span id="paypal-button-client"></span>
+                            </div>  
+                        </div>
+                    </div>
+                    <div id="paypal" class="col s12">
+                        <br/>
+                        <div class="row">
+                            <div class="col s6">
+                                <a class="waves-effect waves-light btn" href="/rest/shipping">Checkout</a>
+                            </div>
+                            <div class="col s6">
+                                <span id="paypal-button-paypal"></span>
+                            </div>  
+                        </div>
+                    </div>
+                    <div id="jquery" class="col s12">
+                        <br/>
+                        <div class="row">
+                            <div class="col s6">
+                                <a class="waves-effect waves-light btn" href="/rest/shipping">Checkout</a>
+                            </div>
+                            <div class="col s6">
+                                <span id="paypal-button-jquery"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+</div>
+    
+
+{{#if complete}}
+<script type="text/javascript">
+    // Client
+    paypal.Button.render({
+        client: {
+            sandbox:    'ARkR7soWd2kUxFCNPHOmyb3IQhOwiL-wYhRmsRRD1SdslE0u-lCEps4LdN_KocpyEPgaWJXcsFuwd99M',
+            production: '<insert production client id>',
+        },
+        env: 'sandbox', // Or 'sandbox',
+        payment: function(data, actions) {
+            // You can use most of the options from the REST api
+            // https://developer.paypal.com/docs/api/payments/#payment_create
+            return actions.payment.create({
+                payment: {
+                    transactions: [
+                        {
+                            amount: { total: '0.01', currency: 'USD' },
+                        }
+                    ],
+                    redirect_urls: {
+                        return_url: "http://localhost:3000/rest/shipping",
+                        cancel_url: "http://localhost:3000/classic/cancel",
+                    }
+                }
+            })
+            .then(function (response) {
+                console.log('Create Response', response);
+                // Do something before rendering PayPal
+                return response;
+            })
+            .catch(function (err) {
+                // Throw error to onError callback
+                throw err;
+            });
+        },
+        onAuthorize: function(data, actions) {
+            console.log('onAuthorize data', data);
+            console.log('onAuthorize actions', actions);
+            // Alternative
+            // return window.location.href = '/rest/confirm?paymentId=' + data.paymentID
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            // You will want to handle this differently
+            return alert('You cancelled!');
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button-client');
+
+    // PayPal
+    paypal.Button.render({
+        env: 'sandbox', // Or 'sandbox',
+        payment: function(data, actions) {
+            return paypal.request.post('/rest/api/create')
+                .then(function (response) {
+                    return response.id;
+                })
+                .catch(function (err) {
+                    // Throw error to onError callback
+                    throw err;
+                });
+        },
+        onAuthorize: function(data, actions) {
+            console.log('onAuthorize data', data);
+            console.log('onAuthorize actions', actions);
+            // Alternative
+            // return window.location.href = '/rest/confirm?paymentId=' + data.paymentID
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            // You will want to handle this differently
+            return alert('You cancelled!');
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button-paypal');
+
+    // Jquery
+    paypal.Button.render({
+        env: 'sandbox', // Or 'sandbox',
+        payment: function(data, actions) {
+            return new paypal.Promise(function (resolve, reject) {
+                $.ajax('/rest/api/create', {
+                    method: 'POST',
+                    success: function (response) {
+                        if (!response || !response.id) {
+                            throw new Error('There was an error fetching the PayPal token');
+                        }
+                        return resolve(response.id);
+                    },
+                    error: function (error) {
+                        return reject(error);
+                    }
+                });
+            });
+        },
+        onAuthorize: function(data, actions) {
+            console.log('onAuthorize data', data);
+            console.log('onAuthorize actions', actions);
+            // Alternative
+            // return window.location.href = '/rest/confirm?paymentId=' + data.paymentID
+            return actions.redirect();
+        },
+        onCancel: function (data, actions) {
+            // You will want to handle this differently
+            return alert('You cancelled!');
+        },
+        onError: function (error) {
+            // You will want to handle this differently
+            return alert(error);
+        }
+    }, '#paypal-button-jquery');
+</script>
+{{/if}}
+{{> footer}}
+

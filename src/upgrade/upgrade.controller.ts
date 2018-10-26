@@ -3,6 +3,22 @@ import { Controller, Get, Render, Req } from '@nestjs/common';
 @Controller('upgrade')
 export class UpgradeController {
 
+    @Get('cart')
+    @Render('upgrade/cart')
+    cart(@Req() req) {
+        return {
+            complete: req.query.complete === 'true' ? true : false,
+        };
+    }
+
+    @Get('payment')
+    @Render('upgrade/payment')
+    payment(@Req() req) {
+        return {
+            complete: req.query.complete === 'true' ? true : false,
+        };
+    }
+    /*
     @Get('link')
     @Render('upgrade-link-cart')
     link(@Req() req) {
@@ -42,5 +58,6 @@ export class UpgradeController {
             complete: req.query.complete === 'true' ? true : false,
         };
     }
+    */
 
 }

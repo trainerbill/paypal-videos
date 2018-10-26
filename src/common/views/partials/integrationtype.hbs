@@ -1,0 +1,32 @@
+<h5>Integration Type</h5>
+<p>
+    <input type="radio" name="integrationType" value="client" id="integrationTypeClient" />
+    <label for="integrationTypeClient">Client</label>
+</p>
+<p>
+    <input type="radio" name="integrationType" value="paypal" id="integrationTypePayPalServer" />
+    <label for="integrationTypePayPalServer">PayPal Server</label>
+</p>
+<p>
+    <input type="radio" name="integrationType" value="jquery" id="integrationTypeJqueryServer" />
+    <label for="integrationTypeJqueryServer">Jquery</label>
+</p>
+
+<script type="text/javascript">
+    var searchParams = new URLSearchParams(window.location.search);
+
+    var type = searchParams.get('integrationType');
+    if (type) {
+        $("#"+type).prop("checked", true);
+    } else {
+        $("#integrationTypeClient").prop("checked", true);
+    }
+    
+
+    document.getElementsByName('integrationType').forEach(function(ele) {
+        ele.addEventListener('change', function (event) {
+            searchParams.set('integrationType', event.target.id);
+            window.location.search = searchParams.toString();
+        });
+    });
+</script>
